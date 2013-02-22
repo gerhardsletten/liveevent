@@ -47,15 +47,15 @@
 					</form>                            	
 				{/if}
 				{if is_set($child.data_map.comments)}
-				<span class="ico-comment">{fetch( 'comment', 'comment_count', 
+				<span class="ico-comment"><span id="comment-count-{$child.node_id}">{fetch( 'comment', 'comment_count', 
                              hash( 'contentobject_id', $child.object.id,
-                                   'status', 1 ) )} comments</span> | <a href="#comments-{$child.node_id}" class="toggle">Show</a>
+                                   'status', 1 ) )}</span> comments</span> <a href="#comments-{$child.node_id}" class="comment-toggle">Show</a>
                 {/if}
                 
             </div>
             {if is_set($child.data_map.comments)}
-			<div class="comments" id="comments-{$child.node_id}" style="display:none">
-				{attribute_view_gui attribute=$child.data_map.comments}
+			<div class="comments" id="comments-{$child.node_id}" style="display:none" data-url={concat('/ezjscore/call/ezjsctemplate::livecomments::',$child.node_id)|ezurl()}>
+				Loading..
 			</div>
 			{/if}
 		</div>

@@ -5,8 +5,7 @@
 
 		{include uri='design:page_head.tpl'}
 		
-		{ezcss_load(array('style.css'))}
-		
+		{ezcss_load(array('vendors/jquery.pnotify.default.css','style.css'))}
 		{ezscript_load(
 			array('https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js',
 				'vendors/jquery.nyroModal-1.6.2.min.js',
@@ -14,6 +13,8 @@
 				'vendors/jquery.twitter.js',
 				'vendors/jquery.countdown.js',
 				'vendors/jquery.timeago.js',
+				'vendors/jquery.pnotify.min.js',
+				'vendors/spin.min.js',
 				'main.js'
 		))}
 		<!--[if lt IE 9]>

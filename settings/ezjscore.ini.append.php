@@ -4,7 +4,7 @@
 FunctionList[]=heiverden
 ##FunctionList[]=geteventlist
 FunctionList[]=liveevent
-
+FunctionList[]=livecomments
 
 [ezjscServer_liveajaxfunctions]
 Class=LiveAjaxFunctions

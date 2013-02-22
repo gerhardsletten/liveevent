@@ -37,7 +37,7 @@
 
 		{/if}
 
-		<form action="#" id="status">
+		<form action="#" id="status" data-url={concat('/ezjscore/call/liveajaxfunctions::add_content')|ezurl()}>
 			<input type="hidden" id="nonce" value="{nonce()}" />
 			<input type="hidden" id="parent_id" value="{$node.node_id}" />
 			<div class="status-area"><textarea placeholder="Add a status" id="status-area"></textarea></div>
@@ -62,69 +62,6 @@
 				{/if}
 			</div>
 		</form>
-		
-		{ezscript_require(array('vendors/jquery.pnotify.min.js','vendors/spin.min.js' ))}
-		{ezcss_require( array( 'vendors/jquery.pnotify.default.css' ) )}
-		<script>
-		var url = {concat('/ezjscore/call/liveajaxfunctions::add_content')|ezurl()};
-		{literal}
-		$(function(){
-			$('#status').submit(function(e){
-				e.preventDefault();
-				var me = $(this),
-					button = me.find('.defaultbutton'),
-					spinner = $('<span class="spinner" />');
-				me.append(spinner).addClass('loading');
-				button.attr('disabled','disabled');
-				var opts = {
-				  lines: 9,
-				  length: 10, 
-				  width: 4,
-				  radius: 5,
-				  corners: 1, 
-				  rotate: 0, 
-				  color: '#000', 
-				  speed: 1, 
-				  trail: 42,
-				  shadow: false, 
-				  hwaccel: false, 
-				  className: 'spin', 
-				  zIndex: 2e9, 
-				  top: 'auto', 
-				  left: 'auto'
-				};
-				var spinner2 = new Spinner(opts).spin(spinner.get(0));
-
-				$.post(url, {
-					nonce : $('#nonce').val(),
-					text : $('#status-area').val(),
-					name : $('#username-area').val(),
-					parent_id: $('#parent_id').val()
-				} ,function(data){
-					if(data.error) {
-						$.pnotify({
-						    title: 'Something went wrong',
-						    text: data.error,
-						    type: 'error'
-						});
-					} else {
-						$('#events').trigger('Event.Reset');
-						$('#status-area').val('');
-						$.pnotify({
-						    title: 'Comment added',
-						    text: "kkkdkd"
-						});
-					}
-					spinner.remove();
-					me.removeClass('loading');
-					button.removeAttr('disabled');
-				});
-				
-			});
-			
-		});
-		{/literal}
-		</script>
 		
 				{*<a href={"/layout/set/ajax/user/login"|ezurl} class="lightbox">Login</a> or <a href={"/layout/set/ajax/user/register"|ezurl} class="lightbox">register</a> to comment*}
 			

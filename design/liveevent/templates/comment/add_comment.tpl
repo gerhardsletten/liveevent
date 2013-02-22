@@ -8,7 +8,7 @@
 {def $language_code = $attribute.language_code}
 {def $fieldRequiredText = '<span class="ezcom-field-mandatory">*</span>'}
 
-<form method="post" action={'/comment/add'|ezurl} name="CommentAdd">
+<form method="post" action={'/comment/add'|ezurl} name="CommentAdd" class="CommentAdd">
 <input type="hidden" name="ContentObjectID" value="{$contentobject_id}" />
 <input type="hidden" name="CommentLanguageCode" value="{$language_code}" />
 <input type="hidden" name="RedirectURI" value={$redirect_uri|ezurl( , 'full' )} />
@@ -22,12 +22,18 @@
         {undef $titleRequired}
         {/if}
 
+
+
         {if $fields|contains( 'name' )}
+        {if $is_anonymous}
         {def $nameRequired = ezini( 'name', 'Required', 'ezcomments.ini' )|eq( 'true' )}
         <div class="block {if $nameRequired}required{/if}">
           <input type="text" maxlength="50" id="CommentName" name="CommentName" placeholder="Name" />
         </div>
         {undef $nameRequired}
+        {else}
+           <input type="hidden" id="CommentName" name="CommentName" value="{$user.contentobject.name|wash}" />
+        {/if}
         {/if}
 
         {if $fields|contains( 'website' )}
@@ -39,16 +45,15 @@
         {/if}
 
         {if $fields|contains( 'email' )}
+        {if $is_anonymous}
         {def $emailRequired = ezini( 'email', 'Required', 'ezcomments.ini' )|eq( 'true' )}
             <div class="block {if $emailRequired}required{/if}">
-                {if $is_anonymous|not}
-                    <input type="text" maxlength="100" id="CommentEmail" disabled="disabled" placeholder="Your email" />
-                    <input type="hidden" name="CommentEmail" />
-                {else}
                     <input type="text" maxlength="100" id="CommentEmail" name="CommentEmail" placeholder="Your email" />
-                {/if} 
             </div>
         {undef $emailRequired}
+        {else}
+           <input type="hidden" name="CommentEmail" />
+        {/if}
         {/if}
 
         <div class="block {if $emailRequired}required{/if}">
