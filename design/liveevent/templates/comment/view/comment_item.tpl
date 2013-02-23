@@ -5,7 +5,7 @@
 {if not( is_set( $self_delete ) )}
     {def $self_delete=false()}
 {/if}
-<div class="comment-row">
+<div class="comment-row" data-published="{$comment.created}">
     <span class="avatar">
         <img src="http://www.gravatar.com/avatar/{$comment.email|md5}?s=28" alt="{$comment.name|wash}" />
     </span>

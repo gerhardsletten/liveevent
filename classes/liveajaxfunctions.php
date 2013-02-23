@@ -81,42 +81,49 @@ class LiveAjaxFunctions extends ezjscServerFunctions {
         } else {
             die('Missing nonce');
         }
-        
-        
+    }
+    public function updates_count ( $args ) {
+        $node_id = $args[0];
+        $ts = $args[1];
+        $ini = eZINI::instance( 'liveevent.ini' );
+        $classes = $ini->variable( 'Content' , 'Classes' );
+        $node_count = eZFunctionHandler::execute('content','list_count', 
+            array(
+                'parent_node_id' => $node_id,
+                'class_filter_type' => 'include',
+                'class_filter_array' => $classes,
+                'attribute_filter' => array(
+                    array( 'published', '>', $ts )
+                )
+            )
+        );
+        header('Content-type: application/json');
+        return json_encode(array('updates'=>$node_count));
     }
 
+    public function comments_count ( $args ) {
+        $contentobject_id = $args[0];
+        $comments_count = eZFunctionHandler::execute('comment','comment_count', 
+            array(
+                'contentobject_id' => $contentobject_id,
+                'status', 1
+            )
+        );
+        header('Content-type: application/json');
+        return json_encode(array('comments_count'=>$comments_count));
+    }
+
+
+
+    /*
     public function fetch( $args ) {
-        $tpl = templateInit();
-        $tpl->setVariable( 'name', $value );
+        $node_id = $args[0];
+        $node = $parent_node = eZFunctionHandler::execute('content','node', array('node_id' => $node_id) );
+        $tpl = eZTemplate::factory();;
+        $tpl->setVariable( 'node', $node );
         return $tpl->fetch( 'design:node/view/full.tpl' );
-        //return json_encode(array('message'=>$args));
-    }
+    }*/
 
-    public static function latest( $args ) {
-        $ch = curl_init("http://ordnett.no/siste");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-        $content = curl_exec($ch);
-        curl_close($ch);
-        return $content;
-    }
-    public static function produkt_info( $args ) {
-        if (isset($args[0])){
-            $var1 = htmlspecialchars($args[0]);
-        }
-        $json_object = json_encode(array('isbn'=>$var1,'butikkId'=>'MP','sharedsecret'=>'hulahula'));
-        $ch = curl_init("http://www.bokkilden.no/SamboWeb/REST/produktinfo.do?data=".$json_object);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-        $content = curl_exec($ch);
-        curl_close($ch);
-        $dekodet = json_decode($content);
-        return $dekodet;
-    }
-
-    public static function getCacheTime( $functionName ) {
-        return time();
-    }
 }
 
 ?>

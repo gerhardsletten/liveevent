@@ -1,4 +1,5 @@
-{def $user = fetch( 'user', 'current_user' ) }
+{def $user = fetch( 'user', 'current_user' ) 
+	$classes = ezini('Content','Classes', 'liveevent.ini')}
 <strong class="title">
 	Latest race updates
 </strong>
@@ -9,6 +10,7 @@
 			<button class="outline-button" type="submit" name="NewButton">
 				<span class="status-link">Status</span>
 			</button>
+			{if $classes|contains('image')}
 			<form method="post" action={"content/action/"|ezurl}>
 				<button class="outline-button" type="submit" name="NewButton">
 					<span class="photo-link">Photo</span>
@@ -17,6 +19,8 @@
 				<input type="hidden" name="ClassIdentifier" value="image" />
 				<input type="hidden" name="ContentLanguageCode" value="{ezini( 'RegionalSettings', 'ContentObjectLocale', 'site.ini')}" />
 			</form>
+			{/if}
+			{if $classes|contains('live_place')}
 			<form method="post" action={"content/action/"|ezurl}>
 				<button class="outline-button" type="submit" name="NewButton">
 					<span class="place-link">Place</span>
@@ -25,6 +29,8 @@
 				<input type="hidden" name="ClassIdentifier" value="live_place" />
 				<input type="hidden" name="ContentLanguageCode" value="{ezini( 'RegionalSettings', 'ContentObjectLocale', 'site.ini')}" />
 			</form>
+			{/if}
+			{if $classes|contains('live_relation')}
 			<form method="post" action={"content/action/"|ezurl}>
 				<button class="outline-button" type="submit" name="NewButton">
 					<span class="rel-link">Website relation</span>
@@ -33,6 +39,7 @@
 				<input type="hidden" name="ClassIdentifier" value="live_relation" />
 				<input type="hidden" name="ContentLanguageCode" value="{ezini( 'RegionalSettings', 'ContentObjectLocale', 'site.ini')}" />
 			</form>
+			{/if}
 		</nav>
 
 		{/if}
@@ -40,9 +47,8 @@
 		<form action="#" id="status" data-url={concat('/ezjscore/call/liveajaxfunctions::add_content')|ezurl()}>
 			<input type="hidden" id="nonce" value="{nonce()}" />
 			<input type="hidden" id="parent_id" value="{$node.node_id}" />
-			<div class="status-area"><textarea placeholder="Add a status" id="status-area"></textarea></div>
+			<div class="status-area"><textarea placeholder="{if $node.can_create}Add a status{else}Ask a question{/if}" id="status-area"></textarea></div>
 			<div class="post-holder">
-
 				{if $node.can_create}
 					<input type="hidden" id="username-area" value="{$user.contentobject.name|wash}" />
 				{else}
@@ -50,21 +56,37 @@
 				{/if}
 				<input type="submit" class="defaultbutton" value="Post" />
 				{if $user.is_logged_in}
-				<p class="meta">
-					
-						{def $access=fetch( 'user', 'has_access_to', hash(
-							'module','content',
-							'function', 'read',
-							'user_id', $user.contentobject_id ) )}
-						Logged in as <strong>{$user.contentobject.name|wash}</strong> | <a href={"/user/logout"|ezurl}>Logout</a>
-					
-				</p>
+				<p class="meta">Logged in as <strong>{$user.contentobject.name|wash}</strong> | <a href={"/user/logout"|ezurl}>Logout</a></p>
 				{/if}
 			</div>
 		</form>
-		
-				{*<a href={"/layout/set/ajax/user/login"|ezurl} class="lightbox">Login</a> or <a href={"/layout/set/ajax/user/register"|ezurl} class="lightbox">register</a> to comment*}
-			
 	</div>
-	{node_view_gui view='eventlist' content_node=$node page="0"}
+	{def $page_limit = 10
+		$children = array()
+		$children_count=fetch_alias( 'children_count', hash(
+			'parent_node_id', $node.node_id,
+			'class_filter_type', 'include',
+			'class_filter_array', $classes
+		))
+	}
+
+	{set $children = fetch_alias( 'children', hash( 'parent_node_id', $node.node_id,
+		'offset', $view_parameters.offset,
+		'sort_by', array( 'published', false() ),
+		'class_filter_type', 'include',
+		'class_filter_array', $classes,
+		'limit', $page_limit ) )}
+
+	<section id="events" data-url={concat('/ezjscore/call/ezjsctemplate::updates::',$node.node_id)|ezurl()} data-count-url={concat('/ezjscore/call/liveajaxfunctions::updates_count::',$node.node_id)|ezurl()}  data-next-page-url={concat('/ezjscore/call/ezjsctemplate::downdates::',$node.node_id)|ezurl()}>
+		<div class="inner-events">
+			{foreach $children as $child}
+				{include uri='design:parts/row.tpl' child=$child}
+			{/foreach}
+		</div>
+		{if $children_count|gt(sum($view_parameters.offset, $page_limit))}
+			<div class="row">
+				<a href={concat($node.url_alias, '/(offset)/',sum($view_parameters.offset, $page_limit))|ezurl} class="button" id="loading-button">Load more</a>
+			</div>
+		{/if}
+	</section>
 </div>

@@ -1,14 +1,12 @@
-<div class="border-box">
-<div class="border-tl"><div class="border-tr"><div class="border-tc"></div></div></div>
-<div class="border-ml"><div class="border-mr"><div class="border-mc float-break">
+<strong class="title">
+    {"Login"|i18n("design/ezwebin/user/login")}
+</strong>
+<div class="primary-box fill-bottom">
+<div class="row">
 
 <div class="user-login">
 
 <form method="post" action={"/user/login/"|ezurl} name="loginform">
-
-<div class="attribute-header">
-    <h1 class="long">{"Login"|i18n("design/ezwebin/user/login")}</h1>
-</div>
 
 {if $User:warning.bad_login}
 <div class="warning">
@@ -66,6 +64,4 @@
 
 </div>
 
-</div></div></div>
-<div class="border-bl"><div class="border-br"><div class="border-bc"></div></div></div>
-</div>
+</div></div>
