@@ -58,10 +58,10 @@ $(function() {
 	
 	function bindComment(el) {
 		if(my_comment) {
-			my_comment = false;
 			my_comment.off('Event.Update').off('submit').stopTime();
-
 		}
+		
+		my_comment = false;
 		var comments = el,
 			url = comments.attr('data-url'),
 			url_count = comments.attr('data-url-count'),
@@ -111,7 +111,7 @@ $(function() {
 				new_element = false;
 			});
 			comments.trigger('Event.Update');
-		}).everyTime(5000, function() {
+		}).everyTime(10000, function() {
 			if(!is_loading) {
 				$.get(url_count, function(data) {
 					if(parseInt(data.comments_count) > number_of_comments) {
