@@ -42,7 +42,6 @@
 				<img src={'livelogo.png'|ezimage()} alt="{ezini('SiteSettings','SiteName', 'site.ini')|wash}" />
 			</a>
 			<strong class="about">
-				{$top_node_id}
 				{if $rootnode.data_map.description.has_content}
 				{attribute_view_gui attribute=$rootnode.data_map.description}
 				{/if}
