@@ -26,7 +26,8 @@
 		<![endif]-->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 		<link rel="Shortcut icon" href={"favicon.ico"|ezimage} type="image/x-icon" />
-		{def $top_node_id = ezini('SiteSettings','TopNode', 'liveevent.ini')
+		{def $main_node = fetch( 'content', 'node', hash( 'node_id', 2 ) )
+		$top_node_id = ezini('SiteSettings','TopNode', 'liveevent.ini')
 			$in_edit = false()}
 		{if $top_node_id|lt(1)}
 			{set $top_node_id = ezini('SiteSettings','TopNode', 'site.ini')}
@@ -35,6 +36,9 @@
 			}
 		{if or($module_result.uri|contains('content/edit'),$module_result.uri|contains('content/browse'))}
 			{set $in_edit = true()}
+		{/if}
+		{if $main_node.data_map.header_script.has_content}
+			{$main_node.data_map.header_script.content}
 		{/if}
 	</head>
 	<body onload="setTimeout(scrollTo, 0, 0, 1);">
