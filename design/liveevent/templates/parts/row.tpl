@@ -32,7 +32,7 @@
             
         </div>
         {if is_set($child.data_map.comments)}
-		<div class="comments" id="comments-{$child.node_id}" style="display:none" data-url={concat('/ezjscore/call/ezjsctemplate::get_comments::',$child.node_id)|ezurl()} data-url-count={concat('/ezjscore/call/liveajaxfunctions::comments_count::',$child.object.id)|ezurl()} data-count-element="comment-count-{$child.node_id}">
+		<div class="comments" id="comments-{$child.node_id}" style="display:none" data-url={concat('/ezjscore/call/ezjsctemplate::get_comments::',$child.node_id)|ezurl()} data-url-count={concat('/ezjscore/call/liveajaxfunctions::comments_count::',$child.object.id)|ezurl()} data-count-element="#comment-count-{$child.node_id}">
 			Loading..
 		</div>
 		{/if}

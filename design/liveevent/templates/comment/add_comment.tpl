@@ -8,7 +8,7 @@
 {def $language_code = $attribute.language_code}
 {def $fieldRequiredText = '<span class="ezcom-field-mandatory">*</span>'}
 
-<form method="post" action={'/comment/add'|ezurl} name="CommentAdd" class="CommentAdd">
+<form method="post" action={'/comment/add'|ezurl} name="CommentAdd" class="CommentAdd{if $is_anonymous} remember-fields{/if}">
 <input type="hidden" name="ContentObjectID" value="{$contentobject_id}" />
 <input type="hidden" name="CommentLanguageCode" value="{$language_code}" />
 <input type="hidden" name="RedirectURI" value={$redirect_uri|ezurl( , 'full' )} />
@@ -28,7 +28,7 @@
         {if $is_anonymous}
         {def $nameRequired = ezini( 'name', 'Required', 'ezcomments.ini' )|eq( 'true' )}
         <div class="block {if $nameRequired}required{/if}">
-          <input type="text" maxlength="50" id="CommentName" name="CommentName" placeholder="Name" />
+          <input type="text" {literal}pattern=".{3,50}"{/literal} id="CommentName" name="CommentName" placeholder="Name" />
         </div>
         {undef $nameRequired}
         {else}
@@ -48,7 +48,7 @@
         {if $is_anonymous}
         {def $emailRequired = ezini( 'email', 'Required', 'ezcomments.ini' )|eq( 'true' )}
             <div class="block {if $emailRequired}required{/if}">
-                    <input type="text" maxlength="100" id="CommentEmail" name="CommentEmail" placeholder="Your email" />
+                    <input type="email" maxlength="100" id="CommentEmail" name="CommentEmail" placeholder="Your email" />
             </div>
         {undef $emailRequired}
         {else}
@@ -57,7 +57,7 @@
         {/if}
 
         <div class="block {if $emailRequired}required{/if}">
-            <textarea class="box" name="CommentContent" placeholder="Add a comment"></textarea>
+            <textarea class="box" {literal}pattern=".{3,300}"{/literal} name="CommentContent" placeholder="Add a comment"></textarea>
         </div>
 
         {if $fields|contains( 'notificationField' )}
@@ -115,37 +115,10 @@
              {/if}
              {undef $bypass_captcha}
         {/if}
-        {if $is_anonymous}
-            <div class="block">
-                <label>
-                    <input type="checkbox" name="CommentRememberme" checked="checked" value="1" />
-                    {'Remember me'|i18n( 'ezcomments/comment/add/form' )}
-                </label>
-            </div>
-        {/if}
         <div class="ezcom-field">
             <input type="submit" value="{'Add comment'|i18n( 'ezcomments/comment/add/form' )}" class="button" name="AddCommentButton" />
         </div>
 </form>
-
-{ezscript_require( array( 'ezjsc::yui3', 'ezjsc::yui3io', 'ezcomments.js' ) )}
-
-<script type="text/javascript">
-eZComments.cfg = {ldelim}
-                    postbutton: '#ezcom-post-button',
-                    postform: '#ezcom-comment-form',
-                    postlist: '#ezcom-comment-list',
-                    postcontainer: '#ezcom-comment-list',
-                    sessionprefix: '{ezini('Session', 'SessionNamePrefix', 'site.ini')}',
-                    sortorder: '{ezini('GlobalSettings', 'DefaultEmbededSortOrder', 'ezcomments.ini')}',
-                    fields: {ldelim} 
-                                name: '#CommentName',
-                                website: '#CommentWebsite',
-                                email: '#CommentEmail' 
-                            {rdelim}
-                 {rdelim};
-eZComments.init();
-</script>
 
 {undef $comment_notified $fields}
 {undef $user $anonymous_user_id $is_anonymous}

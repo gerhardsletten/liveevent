@@ -8,7 +8,10 @@ Classes[]=live_place
 Classes[]=live_relation
 Classes[]=live_question
 
+# Topnode of the liveevent page
 [SiteSettings]
-TopNode=722
+TopNode=2
+# Which base url for embedded updates, we use javascript top overrides the url to open them in right siteaccess.
+EmbeddedUrlPrefix=http://www.site.no
 
 */ ?>

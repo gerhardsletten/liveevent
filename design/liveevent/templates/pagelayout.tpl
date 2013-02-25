@@ -6,7 +6,7 @@
 		{include uri='design:page_head.tpl'}
 		
 		{ezcss_load(array('vendors/jquery.pnotify.default.css','style.css'))}
-		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={ezini('SiteSettings','GMapsKey')}"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key={ezini('SiteSettings','GMapsKey')}&amp;sensor=false"></script>
 		{ezscript_load(
 			array('https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js',
 				'vendors/jquery.nyroModal-1.6.2.min.js',
@@ -17,6 +17,8 @@
 				'vendors/jquery.pnotify.min.js',
 				'vendors/spin.min.js',
 				'vendors/jquery.timers.min.js',
+				'vendors/jquery.cookie.js',
+				'vendors/modernizr.js',
 				'main.js'
 		))}
 		<!--[if lt IE 9]>
@@ -24,7 +26,11 @@
 		<![endif]-->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 		<link rel="Shortcut icon" href={"favicon.ico"|ezimage} type="image/x-icon" />
-		{def $rootnode = fetch( 'content', 'node', hash( 'node_id', ezini('SiteSettings','TopNode', 'liveevent.ini') ) )
+		{def $top_node_id = ezini('SiteSettings','TopNode', 'liveevent.ini')}
+		{if $top_node_id|lt(1)}
+			{set $top_node_id = ezini('SiteSettings','TopNode', 'site.ini')}
+		{/if}
+		{def $rootnode = fetch( 'content', 'node', hash( 'node_id', $top_node_id ) )
 			$in_edit = false()}
 		{if or($module_result.uri|contains('content/edit'),$module_result.uri|contains('content/browse'))}
 			{set $in_edit = true()}
@@ -36,6 +42,7 @@
 				<img src={'livelogo.png'|ezimage()} alt="{ezini('SiteSettings','SiteName', 'site.ini')|wash}" />
 			</a>
 			<strong class="about">
+				{$top_node_id}
 				{if $rootnode.data_map.description.has_content}
 				{attribute_view_gui attribute=$rootnode.data_map.description}
 				{/if}

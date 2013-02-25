@@ -22,27 +22,26 @@ $(function() {
 	function gmap(el) {
 		var latitude = el.attr('data-latitude'),
 			longitude = el.attr('data-longitude');
-	    if (GBrowserIsCompatible()) {
-	    	if( latitude && longitude )
-				var startPoint = new GLatLng( latitude, longitude ), zoom = 13;
-			else
-				var startPoint = new GLatLng( 0, 0 ), zoom = 0;
-			var map = new GMap2( el[0] );
-			map.addControl( new GSmallMapControl() );
-			map.setCenter( startPoint, zoom );
-			map.addOverlay( new GMarker(startPoint) );
-	    	setTimeout(function(){
-	    		map.setCenter( startPoint, zoom );
-	    	},100);
-			
-			
-		}
+		var myLatlng = new google.maps.LatLng(latitude,longitude);
+		var mapOptions = {
+		  center: myLatlng,
+		  zoom: 13,
+		  mapTypeId: google.maps.MapTypeId.TERRAIN
+		};
+		var map = new google.maps.Map(el[0]);
+		google.maps.event.trigger(map, "resize");
+		map.setOptions(mapOptions);
+		var marker = new google.maps.Marker({
+		    position: myLatlng,
+		    map: map
+		});
 	}
 	function timeago(el) {
 		el.find("abbr.timeago").timeago();
 		el.find('.inline-map').each(function(){
 			gmap($(this));
 		});
+		el.find('.lightbox').nyroModal();
 	}
 	timeago($('#events'));
 	
@@ -55,6 +54,26 @@ $(function() {
 		me.fadeOut();
 		bindComment(target);
 	});
+
+	function storeCookie(form, fields) {
+		var cookie_name = form.attr('name');
+		$.each(fields, function(index, value) {
+			var el = form.find(value);
+			if(el) {
+				$.cookie(cookie_name + "_" + el.attr('name'), el.val());
+			}
+		});
+	}
+
+	function readCookie(form, fields) {
+		var cookie_name = form.attr('name');
+		$.each(fields, function(index, value) {
+			var el = form.find(value);
+			if(el && el.val().length < 1 ) {
+				el.val( $.cookie(cookie_name + "_" + el.attr('name')) );
+			}
+		});
+	}
 	
 	function bindComment(el) {
 		if(my_comment) {
@@ -65,10 +84,13 @@ $(function() {
 		var comments = el,
 			url = comments.attr('data-url'),
 			url_count = comments.attr('data-url-count'),
+			count_el = $(comments.attr('data-count-element')),
+			remember = false,
 			number_of_comments = 0,
 			is_loading = false,
 			new_element = false,
 			form = false;
+
 		comments.on('Event.Update', function(e){
 			if(!is_loading) {
 				is_loading = true;
@@ -80,24 +102,36 @@ $(function() {
 						timeago(comments);
 						number_of_comments = comments.find('.comment-row').length,
 						form = comments.find('form'),
+						remember = form.hasClass('remember-fields')
 						comments.fadeIn();
+						if(remember) {
+							readCookie(form, ['#CommentName','#CommentEmail']);
+						}
+						
+						bindPlaceholders(comments);
 						is_loading = false;
+						count_el.text(number_of_comments);
 					}
 				});
 			}
 		}).on('submit', 'form', function(e) {
+			
 			e.preventDefault();
 			var action = form.attr('action'),
 				button = form.find('.button');
-			console.log(form);
+			
 			if(!is_loading) {
 				is_loading = true;
 				formStartLoading(form, button);
+				if(remember) {
+					storeCookie(form, ['#CommentName','#CommentEmail']);
+				}
 				$.ajax({
 					type: "POST",
 					url: action,
 					data: form.serialize() + '&'+ button.attr('name') + "=1",
 					success: function(data){
+						
 						is_loading = false;
 						comments.trigger('Event.Update');
 						formEndLoading(form, button);
@@ -125,6 +159,7 @@ $(function() {
 						} else {
 							new_element.text(diff + ' new comments').show();
 						}
+						count_el.text(data.comments_count);
 					}
 				});
 			}
@@ -135,8 +170,7 @@ $(function() {
 	$("body").on('click', '.embedded a', function(e){
 		var me = $(this),
 			preplace_link = me.parents('.embedded').attr('data-replace-link');
-			link.attr('href', preplace_link).attr("target","_blank");
-
+		me.attr('href', preplace_link).attr("target","_blank");
 	});
 
 	function formStartLoading(el, button) {
@@ -198,7 +232,6 @@ $(function() {
 			last_updated = target.find('.row').first().attr('data-published'),
 			new_element = false;
 		
-		//last_updated = ;
 		holder.everyTime(20000, function() {
 			if(!is_loading) {
 				$.get(url_count + "::" + last_updated, function(data) {
@@ -239,10 +272,12 @@ $(function() {
 					var el = $("<div/>");
 					el[0].innerHTML = data;
 					last_updated = el.find('.row').first().attr('data-published');
-					timeago(el);
+					
 					el.hide();
 					target.prepend(el);
-					el.slideDown();
+					el.slideDown('fast',function(){
+						timeago(el);
+					});
 				});
 			}
 		});
@@ -301,6 +336,35 @@ $(function() {
 	};
 	$.nyroModalSettings(initSettingSize);
 
+	// Fix placeholders for input for IE 9 <
+	function bindPlaceholders(el) {
+		if(!Modernizr.input.placeholder){
+			el.find('[placeholder]').focus(function() {
+			  var input = $(this);
+			  if (input.val() == input.attr('placeholder')) {
+				input.val('');
+				input.removeClass('placeholder');
+			  }
+			}).blur(function() {
+			  var input = $(this);
+			  if (input.val() == '' || input.val() == input.attr('placeholder')) {
+				input.addClass('placeholder');
+				input.val(input.attr('placeholder'));
+			  }
+			}).blur();
+			el.find('[placeholder]').parents('form').submit(function() {
+			  $(this).find('[placeholder]').each(function() {
+				var input = $(this);
+				if (input.val() == input.attr('placeholder')) {
+				  input.val('');
+				}
+			  })
+			});
+
+		}
+	}
+	bindPlaceholders($('body'));
+
 	//Initial load of page
 	sizeContent();
 	$(window).resize(sizeContent);
@@ -319,7 +383,5 @@ var breakpoint = 600;
 	    	} else {
 	    		me.css('height','auto');
 	    	}
-	    	
-
 	    });
 	}
