@@ -26,12 +26,13 @@
 		<![endif]-->
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 		<link rel="Shortcut icon" href={"favicon.ico"|ezimage} type="image/x-icon" />
-		{def $top_node_id = ezini('SiteSettings','TopNode', 'liveevent.ini')}
+		{def $top_node_id = ezini('SiteSettings','TopNode', 'liveevent.ini')
+			$in_edit = false()}
 		{if $top_node_id|lt(1)}
 			{set $top_node_id = ezini('SiteSettings','TopNode', 'site.ini')}
 		{/if}
 		{def $rootnode = fetch( 'content', 'node', hash( 'node_id', $top_node_id ) )
-			$in_edit = false()}
+			}
 		{if or($module_result.uri|contains('content/edit'),$module_result.uri|contains('content/browse'))}
 			{set $in_edit = true()}
 		{/if}
