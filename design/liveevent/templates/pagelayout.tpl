@@ -37,7 +37,7 @@
 			{set $in_edit = true()}
 		{/if}
 	</head>
-	<body onload="setTimeout(scrollTo, 0, 0, 1);" data-rel="{$top_node_id}">
+	<body onload="setTimeout(scrollTo, 0, 0, 1);">
 		<header id="header">
 			<a href={'/'|ezurl} class="logo">
 				<img src={'livelogo.png'|ezimage()} alt="{ezini('SiteSettings','SiteName', 'site.ini')|wash}" />
