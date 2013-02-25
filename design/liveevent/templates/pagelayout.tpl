@@ -86,7 +86,7 @@
 			<aside class="secondary-column">
 				{if $rootnode.data_map.map_url.has_content}
 				<strong class="title">
-					Map of the race
+					Race map
 					<a href="{$rootnode.data_map.map_url.content}" class="expand-link" rel="external">Open in new window</a>
 				</strong>
 				

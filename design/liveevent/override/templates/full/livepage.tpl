@@ -1,7 +1,7 @@
 {def $user = fetch( 'user', 'current_user' ) 
 	$classes = ezini('Content','Classes', 'liveevent.ini')}
 <strong class="title">
-	Latest race updates
+	Race updates
 </strong>
 <div class="primary-box fill-bottom">
 	<div class="row">
@@ -43,16 +43,16 @@
 		</nav>
 
 		{/if}
-
+		{cache-block keys=array( $user.contentobject_id )}
 		<form action="#" id="status" data-url={concat('/ezjscore/call/liveajaxfunctions::add_content')|ezurl()}>
 			<input type="hidden" id="nonce" value="{nonce()}" />
 			<input type="hidden" id="parent_id" value="{$node.node_id}" />
-			<div class="status-area"><textarea placeholder="{if $node.can_create}Add a status{else}Ask a question{/if}" id="status-area"></textarea></div>
+			<div class="status-area"><textarea placeholder="{if $node.can_create}Add a status{else}Ask a question{/if}" {literal}pattern=".{3,50}"{/literal} id="status-area"></textarea></div>
 			<div class="post-holder">
-				{if $node.can_create}
-					<input type="hidden" id="username-area" value="{$user.contentobject.name|wash}" />
+				{if $user.contentobject_id|eq(10)}
+					<input type="text" id="username-area" {literal}pattern=".{3,50}"{/literal} placeholder="Your name" />
 				{else}
-					<input type="text" id="username-area" placeholder="Your name" />
+					<input type="hidden" id="username-area" value="{$user.contentobject.name|wash}" />
 				{/if}
 				<input type="submit" class="defaultbutton" value="Post" />
 				{if $user.is_logged_in}
@@ -60,17 +60,10 @@
 				{/if}
 			</div>
 		</form>
+		{/cache-block}
 	</div>
 	{def $page_limit = 10
-		$children = array()
-		$children_count=fetch_alias( 'children_count', hash(
-			'parent_node_id', $node.node_id,
-			'class_filter_type', 'include',
-			'class_filter_array', $classes
-		))
-	}
-
-	{set $children = fetch_alias( 'children', hash( 'parent_node_id', $node.node_id,
+		$children = fetch_alias( 'children', hash( 'parent_node_id', $node.node_id,
 		'offset', $view_parameters.offset,
 		'sort_by', array( 'published', false() ),
 		'class_filter_type', 'include',
@@ -83,10 +76,8 @@
 				{include uri='design:parts/row.tpl' child=$child}
 			{/foreach}
 		</div>
-		{if $children_count|gt(sum($view_parameters.offset, $page_limit))}
 			<div class="row">
 				<a href={concat($node.url_alias, '/(offset)/',sum($view_parameters.offset, $page_limit))|ezurl} class="button" id="loading-button">Load more</a>
 			</div>
-		{/if}
 	</section>
 </div>

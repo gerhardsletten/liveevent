@@ -51,8 +51,14 @@ $(function() {
 		e.preventDefault();
 		var me = $(this),
 			target = $(this.hash);
-		me.fadeOut();
-		bindComment(target);
+		if(target.is(':visible')) {
+			me.text('Show');
+			target.trigger('Event.Destory').fadeOut();
+		} else {
+			me.text('Hide');
+			bindComment(target);
+		}
+		
 	});
 
 	function storeCookie(form, fields) {
@@ -76,95 +82,104 @@ $(function() {
 	}
 	
 	function bindComment(el) {
-		if(my_comment) {
-			my_comment.off('Event.Update').off('submit').stopTime();
-		}
-		
-		my_comment = false;
-		var comments = el,
-			url = comments.attr('data-url'),
-			url_count = comments.attr('data-url-count'),
-			count_el = $(comments.attr('data-count-element')),
-			remember = false,
-			number_of_comments = 0,
-			is_loading = false,
-			new_element = false,
-			form = false;
+		el.each(function() {
+			var comments = $(this),
+				url = comments.attr('data-url'),
+				url_count = comments.attr('data-url-count'),
+				count_el = $(comments.attr('data-count-element')),
+				remember = false,
+				number_of_comments = 0,
+				is_loading = false,
+				new_element = false,
+				form = false,
+				checked_for_updates = 0;
 
-		comments.on('Event.Update', function(e){
-			if(!is_loading) {
-				is_loading = true;
-				$.ajax({
-					type: "GET",
-					url: url,
-					success: function(data){
-						comments[0].innerHTML = data;
-						timeago(comments);
-						number_of_comments = comments.find('.comment-row').length,
-						form = comments.find('form'),
-						remember = form.hasClass('remember-fields')
-						comments.fadeIn();
-						if(remember) {
-							readCookie(form, ['#CommentName','#CommentEmail']);
+			comments.on('Event.Destroy', function(e){
+				comments.off('Event.Update').off('submit').stopTime();
+				comments.html('');
+			}).on('Event.Update', function(e){
+				if(!is_loading) {
+					is_loading = true;
+					$.ajax({
+						type: "GET",
+						url: url,
+						success: function(data){
+							comments[0].innerHTML = data;
+							timeago(comments);
+							number_of_comments = comments.find('.comment-row').length,
+							form = comments.find('form'),
+							remember = form.hasClass('remember-fields')
+							comments.fadeIn();
+							if(remember) {
+								readCookie(form, ['#CommentName','#CommentEmail']);
+							}
+							is_loading = false;
+							checked_for_updates = 0;
+							comments.stopTime().trigger('Event.Trigger');
+							
+							bindPlaceholders(comments);
+							
+							count_el.text(number_of_comments);
 						}
-						
-						bindPlaceholders(comments);
-						is_loading = false;
-						count_el.text(number_of_comments);
-					}
-				});
-			}
-		}).on('submit', 'form', function(e) {
-			
-			e.preventDefault();
-			var action = form.attr('action'),
-				button = form.find('.button');
-			
-			if(!is_loading) {
-				is_loading = true;
-				formStartLoading(form, button);
-				if(remember) {
-					storeCookie(form, ['#CommentName','#CommentEmail']);
+					});
 				}
-				$.ajax({
-					type: "POST",
-					url: action,
-					data: form.serialize() + '&'+ button.attr('name') + "=1",
-					success: function(data){
-						
-						is_loading = false;
-						comments.trigger('Event.Update');
-						formEndLoading(form, button);
-					}
-				});
-			}
-		}).on('click', '.row-sticky', function(e) {
-			e.preventDefault();
-			new_element.fadeOut("fast",function(){
-				$(this).remove();
-				new_element = false;
-			});
-			comments.trigger('Event.Update');
-		}).everyTime(10000, function() {
-			if(!is_loading) {
-				$.get(url_count, function(data) {
-					if(parseInt(data.comments_count) > number_of_comments) {
-						var diff = parseInt(data.comments_count) - number_of_comments;
-						if(!new_element) {
-							new_element = $('<div class="comment-row row-sticky"></div>').hide();
-							form.prepend(new_element);
+			}).on('Event.Trigger', function(e){
+				if(!is_loading) {
+					$.get(url_count, function(data) {
+						checked_for_updates++;
+						if(parseInt(data.comments_count) > number_of_comments) {
+							var diff = parseInt(data.comments_count) - number_of_comments;
+							if(!new_element) {
+								new_element = $('<div class="comment-row row-sticky"></div>').hide();
+								form.prepend(new_element);
+							}
+							if(diff < 2) {
+								new_element.text(diff + ' new comment').show();
+							} else {
+								new_element.text(diff + ' new comments').show();
+							}
+							count_el.text(data.comments_count);
 						}
-						if(diff < 2) {
-							new_element.text(diff + ' new comment').show();
-						} else {
-							new_element.text(diff + ' new comments').show();
+						if(checked_for_updates < 4) {
+							comments.oneTime(10000, function() {
+								comments.trigger('Event.Trigger')
+							});
 						}
-						count_el.text(data.comments_count);
+					});
+				}
+			}).on('submit', 'form', function(e) {
+				
+				e.preventDefault();
+				var action = form.attr('action'),
+					button = form.find('.button');
+				
+				if(!is_loading) {
+					is_loading = true;
+					formStartLoading(form, button);
+					if(remember) {
+						storeCookie(form, ['#CommentName','#CommentEmail']);
 					}
+					$.ajax({
+						type: "POST",
+						url: action,
+						data: form.serialize() + '&'+ button.attr('name') + "=1",
+						success: function(data){
+							
+							is_loading = false;
+							comments.trigger('Event.Update');
+							formEndLoading(form, button);
+						}
+					});
+				}
+			}).on('click', '.row-sticky', function(e) {
+				e.preventDefault();
+				new_element.fadeOut("fast",function(){
+					$(this).remove();
+					new_element = false;
 				});
-			}
-		}, 100).trigger('Event.Update');
-		my_comment = el;
+				comments.trigger('Event.Update');
+			}).trigger('Event.Update');
+	});
 	}
 
 	$("body").on('click', '.embedded a', function(e){
@@ -200,6 +215,7 @@ $(function() {
 			nonce : $('#nonce').val(),
 			text : $('#status-area').val(),
 			name : $('#username-area').val(),
+			email: $('#email-area').val(),
 			parent_id: $('#parent_id').val()
 		} ,function(data){
 			if(data.error) {

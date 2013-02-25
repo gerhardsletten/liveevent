@@ -1,12 +1,13 @@
 <div class="row" data-published="{$child.object.published}">
 	<span class="avatar">
-		<img src="http://www.gravatar.com/avatar/{$child.creator.data_map.user_account.content.email|md5}?s=48" alt="{$child.creator.name|wash}" />
+		<img src="{if $child.class_identifier|eq('live_question')}{'avatar.png'|ezimage('no')}{else}http://www.gravatar.com/avatar/{$child.creator.data_map.user_account.content.email|md5}?s=48{/if}" alt="{$child.creator.name|wash}" />
 	</span>
 	<div class="row-inner">
 		<p class="meta"><abbr class="timeago" title="{$child.object.published|datetime(custom, '%Y-%m-%dT%H:%i:%sZ%O')}">{$child.object.published|l10n(shortdatetime)}</abbr> by {if $child.class_identifier|eq('live_question')}{attribute_view_gui attribute=$child.data_map.name}{else}{$child.creator.name|wash}{/if}</p>
 
 		{node_view_gui view='line' content_node=$child}
 		<div class="meta">
+			
 			{if or($child.can_edit,$child.can_remove, 1|eq(2))}
 				<form method="post" action={"content/action/"|ezurl} class="actions">
 					<input type="hidden" name="ContentObjectID" value="{$child.object.id}" />
@@ -25,9 +26,10 @@
 				</form>                            	
 			{/if}
 			{if is_set($child.data_map.comments)}
-			<span class="ico-comment"><span id="comment-count-{$child.node_id}">{fetch( 'comment', 'comment_count', 
+				{def $comment_count = fetch( 'comment', 'comment_count', 
                          hash( 'contentobject_id', $child.object.id,
-                               'status', 1 ) )}</span> comments</span> <a href="#comments-{$child.node_id}" class="comment-toggle">Show</a>
+                               'status', 1 ) )}
+			<span class="ico-comment"><span id="comment-count-{$child.node_id}">{$comment_count}</span> comments</span> <a href="#comments-{$child.node_id}" class="comment-toggle">{if $comment_count|gt(0)}Show and write{else}Be the first to comment{/if}</a>
             {/if}
             
         </div>
