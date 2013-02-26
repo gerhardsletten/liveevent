@@ -1,3 +1,4 @@
+{set-block scope=global variable=cache_ttl}0{/set-block}
 {def $user = fetch( 'user', 'current_user' ) 
 	$classes = ezini('Content','Classes', 'liveevent.ini')}
 <strong class="title">
