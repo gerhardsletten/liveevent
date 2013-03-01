@@ -7,12 +7,13 @@ class LiveAjaxFunctions extends ezjscServerFunctions {
     public function add_content( $args ) {
         if(isset($_POST['nonce'])) {
             session_start();
-            if($_POST['nonce'] !=  $_SESSION['live_nonce']) {
-                die('Your are busted!');
-            }
-                
             $return = array();
             $user =& eZUser::currentUser();
+            if($_POST['nonce'] !=  $_SESSION['live_nonce']) {
+                $return = array('error' => "Wrong nonce");
+            }
+                
+            
 
             if( isset($_POST['text']) && strlen($_POST['text'])> 1 && isset($_POST['name']) && strlen($_POST['name']) > 1 && isset($_POST['parent_id']) && strlen($_POST['parent_id']) > 0 ) {
                 
@@ -75,12 +76,13 @@ class LiveAjaxFunctions extends ezjscServerFunctions {
                 $return['error'] = "Missing username or message";
             }
 
-            header('Content-type: application/json');
-            return json_encode($return);
+            
 
         } else {
-            die('Missing nonce');
+            $return = array('error' => "Missing nonce");
         }
+        header('Content-type: application/json');
+            return json_encode($return);
     }
     public function updates_count ( $args ) {
         $node_id = $args[0];
