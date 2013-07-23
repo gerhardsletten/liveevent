@@ -1,21 +1,21 @@
 $(function() {
 	var spinneropts = {
-		  lines: 9,
-		  length: 10, 
-		  width: 4,
-		  radius: 5,
-		  corners: 1, 
-		  rotate: 0, 
-		  color: '#000', 
-		  speed: 1, 
-		  trail: 42,
-		  shadow: false, 
-		  hwaccel: false, 
-		  className: 'spin', 
-		  zIndex: 2e9, 
-		  top: 'auto', 
-		  left: 'auto'
-		};
+		lines: 9,
+		length: 10, 
+		width: 4,
+		radius: 5,
+		corners: 1, 
+		rotate: 0, 
+		color: '#000', 
+		speed: 1, 
+		trail: 42,
+		shadow: false, 
+		hwaccel: false, 
+		className: 'spin', 
+		zIndex: 2e9, 
+		top: 'auto', 
+		left: 'auto'
+	};
 
 	
 
