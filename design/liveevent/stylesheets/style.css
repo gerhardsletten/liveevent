@@ -101,7 +101,7 @@ footer {display:none;}
 /* Boxes */
 .title {display: block; margin: 15px .5% 5px;font-size: 16px; color:#919DA3; text-shadow: 0 1px 0 #fff;}
 .primary-box {background:#fff; box-shadow: 0 0 9px rgba(0,0,0,.5); }
-.primary-box iframe {margin: 0; display:block; border:none; width: 100%; }
+.primary-box iframe {margin: 0; display:block; border:none; width: 100%; max-height:100% }
 .row {padding: 10px 14px;border-bottom: 1px solid #ccc; }
 .row .avatar {float:left; margin-right: 14px;}
 .avatar img {border: 1px solid #999; border-radius: 2px;}

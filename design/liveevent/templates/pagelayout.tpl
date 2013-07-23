@@ -90,7 +90,11 @@
 			<aside class="secondary-column">
 				{if $rootnode.data_map.map_url.has_content}
 				<strong class="title">
+					{if $rootnode.data_map.map_title.has_content}
+						{attribute_view_gui attribute=$rootnode.data_map.map_title}
+					{else}
 					Race map
+					{/if}
 					<a href="{$rootnode.data_map.map_url.content}" class="expand-link" rel="external">Open in new window</a>
 				</strong>
 				
@@ -120,14 +124,12 @@
 					{/foreach}
 				</div>
 				{/if}
-				{if $rootnode.data_map.twitter_username.has_content}
 				<strong class="title">
 					Twitter feed
 				</strong>
 				<div class="primary-box fill-bottom">
-					<div class="twitter-widget" data-username="{$rootnode.data_map.twitter_username.content|wash}"></div>
+					{$rootnode.data_map.twitter_embed.content}
 				</div>
-				{/if}
 			</aside>
 			{/if}
 		</div>
