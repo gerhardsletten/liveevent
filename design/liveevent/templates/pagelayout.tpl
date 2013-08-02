@@ -114,7 +114,7 @@
 			<aside class="thirdary-column">
 				{if $rootnode.data_map.partners.has_content}
 				<strong class="title">
-					Partners
+					Sponsors
 				</strong>
 				<div class="primary-box">
 					{def $item = array()}
